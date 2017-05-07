@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">Mobile Controller</string>
+
+    <!-- CATEGORIA -->
+    <string name="label_radio_button_debito">Débito</string>
+    <string name="label_radio_button_credito">Crédito</string>
+    <string name="label_categoria_descricao">Descrição</string>
+    <string name="label_erro_categoria_descricao">Digite uma descrição</string>
+    <string name="label_nova_categoria">Nova Categoria</string>
+
+    <!-- CONTA -->
+    <string name="label_conta_saldo_atual">Saldo atual </string>
+    <string name="label_conta_saldo_previsto">Previsão para no final do mês  </string>
+    <string name="label_conta_descricao">Descrição</string>
+    <string name="label_conta_tipo">Tipo</string>
+    <string name="label_conta_saldo">Saldo</string>
+    <string name="label_conta_limite">Limite</string>
+    <string name="label_erro_conta_descricao">Digite uma descrição</string>
+    <string name="label_erro_conta_saldo">Digite o saldo</string>
+    <string name="label_erro_conta_limite">Digite o limite</string>
+
+    <!-- TRANSACAO -->
+    <string name="label_transacao_despesa">Despesa</string>
+    <string name="label_transacao_descricao">Descrição</string>
+    <string name="label_transacao_receita">Receita</string>
+    <string name="label_transacao_categoria">Categoria</string>
+    <string name="label_transacao_conta">Conta</string>
+    <string name="label_transacao_vencimento">Vencimento</string>
+    <string name="label_transacao_efetivado">Efetivado</string>
+    <string name="label_transacao_tipo">Tipo</string>
+    <string name="label_transacao_valor">Valor</string>
+    <string name="label_erro_transacao_descricao">Digite uma descrição</string>
+    <string name="label_erro_transacao_valor">Digite o valor</string>
+
+    <!-- TRANSFERENCIA -->
+    <string name="label_transferencia_valor">Digite o valor</string>
+    <string name="label_transferencia_descricao">Digite uma descrição</string>
+    <string name="label_transferencia_data">Data</string>
+    <string name="label_transferencia_origem">Informe a Conta Origem</string>
+    <string name="label_transferencia_destino">Informe a Conta Destino</string>
+    <string name="label_erro_transferencia_descricao">Digite uma descrição</string>
+    <string name="label_erro_transferencia_valor">Digite o valor</string>
+    <string name="label_erro_transferencia_data">Informe a data da transferência</string>
+
+    <!--ACTIONS -->
+    <string name="label_action_settings">Settings</string>
+    <string name="label_action_home">Home</string>
+    <string name="label_action_categorias">Categorias</string>
+    <string name="label_action_contas">Contas</string>
+    <string name="label_action_transacoes">Transações</string>
+    <string name="label_action_transferencias">Transferências</string>
+    <string name="label_action_cartao">Cartão de Crédito</string>
+    <string name="label_action_novo">Novo</string>
+    <string name="label_action_excluir">Excluir</string>
+    <string name="label_action_salvar">Salvar</string>
+    <string name="label_action_efetivar">Efetivar</string>
+    <string name="label_action_estornar">Estornar</string>
+    <string name="label_action_voltar">Voltar</string>
+    <string name="label_action_sair">Sair</string>
+    <string name="title_activity_conta">Contas</string>
+    <string name="title_activity_categorias">Categorias</string>
+    <string name="title_home">Home</string>
+    <string name="title_transacoes">Transações</string>
+    <string name="title_contas">Contas</string>
+
+    <string name="title_activity_detalhes_categoria">Detalhes da Categoria</string>
+    <string name="title_activity_detalhes_transacao">Detalhes da Transação</string>
+    <string name="title_activity_detalhes_conta">Detalhes da Conta</string>
+    <string name="title_activity_transferencias">Transferências</string>
+    <string name="label_action_transferir">Transferência entre Contas</string>
+    <string name="title_activity_detalhes_transferencia">Detalhes da Transferência</string>
+
+    <string name="label_nova_conta">Nova Conta</string>
+    <string name="label_receita_x_despesa">Receita x Despesa</string>
+    <string name="label_nova_transacao">Nova Transação</string>
+    <string name="label_nova_transferencia">Nova Transferência</string>
+    <string name="label_novo_cartao">Novo Cartão</string>
+    <string name="label_exibir_categorias">Exibir Categorias</string>
+    <string name="label_novo">Novo</string>
+    <string name="label_exibir_transferencias">Exibir Transferências</string>
+</resources>

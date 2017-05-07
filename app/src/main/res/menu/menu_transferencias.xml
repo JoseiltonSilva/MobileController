@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".transferencia.TransferenciasActivity">
+
+    <item android:id="@+id/action_novo"
+        android:title="@string/label_action_novo"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/action_voltar"
+        android:title="@string/label_action_voltar"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+</menu>

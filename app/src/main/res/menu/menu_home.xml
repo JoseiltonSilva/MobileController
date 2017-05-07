@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_novo"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_add_circle_outline_white_24dp"
+        app:showAsAction="always"
+        android:title="@string/label_novo">
+
+        <menu>
+            <item
+                android:id="@+id/action_nova_categoria"
+                android:title="@string/label_nova_categoria"/>
+            <item
+                android:id="@+id/action_nova_conta"
+                android:title="@string/label_nova_conta"/>
+            <item
+                android:id="@+id/action_nova_transacao"
+                android:title="@string/label_nova_transacao"/>
+            <item
+                android:id="@+id/action_nova_transferencia"
+                android:title="@string/label_nova_transferencia"/>
+            <item
+                android:id="@+id/action_novo_cartao"
+                android:title="@string/label_novo_cartao"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/action_categorias"
+        android:orderInCategory="100"
+        android:title="@string/label_exibir_categorias"
+        app:showAsAction="never" />
+</menu>
