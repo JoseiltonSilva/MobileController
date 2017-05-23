@@ -1,7 +1,5 @@
 package com.joseilton.mobilecontroller.util;
 
-
-
 import com.joseilton.mobilecontroller.app.Periodo;
 
 import java.util.Calendar;
@@ -95,7 +93,7 @@ public class DateUtil {
                 return "julho" + "/" + cal.get(Calendar.YEAR);
 
             case 7:
-                return "agoato" + "/" + cal.get(Calendar.YEAR);
+                return "agosto" + "/" + cal.get(Calendar.YEAR);
 
             case 8:
                 return "setembro" + "/" + cal.get(Calendar.YEAR);
@@ -104,11 +102,11 @@ public class DateUtil {
                 return "outubro" + "/" + cal.get(Calendar.YEAR);
 
             case 10:
-                return "novovembro" + "/" + cal.get(Calendar.YEAR);
+                return "novembro" + "/" + cal.get(Calendar.YEAR);
 
 
             case 11:
-                return "dezenbro" + "/" + cal.get(Calendar.YEAR);
+                return "dezembro" + "/" + cal.get(Calendar.YEAR);
 
             default:
                 return "";
