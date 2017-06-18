@@ -5,8 +5,6 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -25,13 +23,11 @@ import android.widget.TextView;
 import com.joseilton.mobilecontroller.R;
 import com.joseilton.mobilecontroller.conta.Conta;
 import com.joseilton.mobilecontroller.conta.ContaService;
-import com.joseilton.mobilecontroller.conta.ContaTipo;
 import com.joseilton.mobilecontroller.util.ColorUtil;
 import com.joseilton.mobilecontroller.util.MensagemUtil;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -351,6 +347,8 @@ public class DetalhesTransferenciaActivity extends AppCompatActivity {
             transferencia.setData(c.getTime());
         }
     };
+
+
 
     public void showDialog(View v) {
         showDialog(v.getId());

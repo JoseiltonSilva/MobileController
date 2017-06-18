@@ -7,17 +7,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
-import com.jjoe64.graphview.helper.StaticLabelsFormatter;
-import com.jjoe64.graphview.series.BarGraphSeries;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.joseilton.mobilecontroller.R;
+import com.joseilton.mobilecontroller.app.Formatador;
+import com.joseilton.mobilecontroller.app.Periodo;
 import com.joseilton.mobilecontroller.transacao.Transacao;
 import com.joseilton.mobilecontroller.transacao.TransacaoService;
 import com.joseilton.mobilecontroller.transacao.TransacaoTipo;
 import com.joseilton.mobilecontroller.util.ColorUtil;
+import com.joseilton.mobilecontroller.util.DateUtil;
 import com.joseilton.mobilecontroller.util.PeriodoUtil;
 
 import java.math.BigDecimal;
@@ -36,15 +43,16 @@ public class ContasAdapter extends RecyclerView.Adapter<ContasAdapter.MyViewHold
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView descricao, tipo, saldo;
-        public GraphView projecaoSaldoGraph, receitaDespesaGraph;
+        public LineChart lineChart;
+        public BarChart barChart;
 
         public MyViewHolder(View view) {
             super(view);
             descricao = (TextView) view.findViewById(R.id.descricao_textView);
             tipo = (TextView) view.findViewById(R.id.tipo_textView);
             saldo = (TextView) view.findViewById(R.id.saldo_atual_textView);
-            projecaoSaldoGraph = (GraphView) view.findViewById(R.id.projecao_saldo_graph);
-            receitaDespesaGraph = (GraphView) view.findViewById(R.id.receita_despesa_graph);
+            lineChart = (LineChart) view.findViewById(R.id.lineChart);
+            barChart = (BarChart) view.findViewById(R.id.barChart);
         }
     }
 
@@ -67,9 +75,10 @@ public class ContasAdapter extends RecyclerView.Adapter<ContasAdapter.MyViewHold
         Conta conta = list.get(position);
         holder.descricao.setText(conta.getDescricao());
         holder.tipo.setText(conta.getTipo().getTipo());
-        holder.saldo.setText(conta.getSaldo().toString());
-        startReceitaDespesaGraph(holder.receitaDespesaGraph, conta);
-        startProjecaoSaldoGraph(holder.projecaoSaldoGraph, conta);
+        holder.saldo.setText(Formatador.formatarValorMonetario(conta.getSaldo()));
+
+        exibirLineChart(holder.lineChart, conta);
+        exibirBarChart(holder.barChart, conta);
     }
 
     @Override
@@ -77,7 +86,68 @@ public class ContasAdapter extends RecyclerView.Adapter<ContasAdapter.MyViewHold
         return list.size();
     }
 
-    private void startReceitaDespesaGraph(GraphView graph, Conta conta) {
+    private void exibirLineChart(LineChart chart, Conta conta) {
+
+        TransacaoService transacaoService = new TransacaoService(mContext);
+        List<Transacao> transacaoList = new ArrayList<>();
+        Periodo periodo = PeriodoUtil.thisMonth(new Date());
+
+        try {
+            transacaoList = transacaoService.getTransacoesPeriodoConta(periodo, conta, null);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Entradas de dados referente ao saldo previsto do período
+        BigDecimal saldoPrevisto = calcularSaldoInicial(transacaoList, conta);
+        List<Entry> entriesSaldoPrevisto = new ArrayList<Entry>();
+
+        entriesSaldoPrevisto.add(new Entry(periodo.getBegin().getDate(), Float.parseFloat(String.valueOf(saldoPrevisto))));
+        for(Transacao t : transacaoList) {
+            if(t.getTipo() == TransacaoTipo.Despesa) {
+                saldoPrevisto = saldoPrevisto.subtract(t.getValor());
+            } else {
+                saldoPrevisto = saldoPrevisto.add(t.getValor());
+            }
+            entriesSaldoPrevisto.add(new Entry(t.getVencimento().getDate(), Float.parseFloat(String.valueOf(saldoPrevisto))));
+        }
+        entriesSaldoPrevisto.add(new Entry(periodo.getEnd().getDate(), Float.parseFloat(String.valueOf(saldoPrevisto))));
+
+        LineDataSet dataSetPrevisto = new LineDataSet(entriesSaldoPrevisto, "Saldo Previsto");
+        dataSetPrevisto.setColor(ColorUtil.RED);
+
+        // Entradas de dados referente ao saldo realizado do período
+        BigDecimal saldoRealizado = calcularSaldoInicial(transacaoList, conta);
+        List<Entry> entriesSaldoRealizado = new ArrayList<Entry>();
+
+        entriesSaldoRealizado.add(new Entry(periodo.getBegin().getDate(), Float.parseFloat(String.valueOf(saldoRealizado))));
+        for(Transacao t : transacaoList) {
+            if(t.isEfetivado() && t.getTipo() == TransacaoTipo.Despesa) {
+                saldoRealizado = saldoRealizado.subtract(t.getValor());
+                entriesSaldoRealizado.add(new Entry(t.getVencimento().getDate(), Float.parseFloat(String.valueOf(saldoRealizado))));
+            }
+            if(t.isEfetivado() && t.getTipo() == TransacaoTipo.Receita) {
+                saldoRealizado = saldoRealizado.add(t.getValor());
+                entriesSaldoRealizado.add(new Entry(t.getVencimento().getDate(), Float.parseFloat(String.valueOf(saldoRealizado))));
+            }
+        }
+        entriesSaldoRealizado.add(new Entry(new Date().getDate(), Float.parseFloat(String.valueOf(saldoRealizado))));
+
+        LineDataSet dataSetRealizado = new LineDataSet(entriesSaldoRealizado, "Saldo Realizado");
+        dataSetRealizado.setColor(ColorUtil.GREEN);
+
+        Description description = new Description();
+        description.setText("Projeção de Saldo - " + DateUtil.getMonthAndYear(new Date()));
+
+        LineData lineData = new LineData(dataSetPrevisto, dataSetRealizado);
+        chart.setData(lineData);
+        chart.setDescription(description);
+        chart.invalidate(); // refresh
+
+    }
+
+    private void exibirBarChart(BarChart chart, Conta conta) {
+
         TransacaoService transacaoService = new TransacaoService(mContext);
 
         List<Transacao> transacaoList = new ArrayList<>();
@@ -89,149 +159,54 @@ public class ContasAdapter extends RecyclerView.Adapter<ContasAdapter.MyViewHold
         }
 
         BigDecimal despesaTotal = new BigDecimal("0.00");
+        BigDecimal despesaPaga = new BigDecimal("0.00");
         BigDecimal receitaTotal = new BigDecimal("0.00");
+        BigDecimal receitaRecebida = new BigDecimal("0.00");
 
         for(Transacao t : transacaoList) {
             if(t.getTipo() == TransacaoTipo.Despesa) {
                 despesaTotal = despesaTotal.add(t.getValor());
+                if(t.isEfetivado()) despesaPaga = despesaPaga.add(t.getValor());
             } else {
                 receitaTotal = receitaTotal.add(t.getValor());
+                if(t.isEfetivado()) receitaRecebida = receitaRecebida.add(t.getValor());
             }
         }
 
-        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
-                new DataPoint(1, Double.parseDouble(String.valueOf(receitaTotal))),
-                new DataPoint(3, Double.parseDouble(String.valueOf(despesaTotal))),
+        List<BarEntry> receitasEntry = new ArrayList<>();
+        receitasEntry.add(new BarEntry(0f, Float.parseFloat(String.valueOf(receitaTotal))));
+        receitasEntry.add(new BarEntry(0f, Float.parseFloat(String.valueOf(receitaRecebida))));
+        List<BarEntry> despesasEntry = new ArrayList<>();
+        despesasEntry.add(new BarEntry(1f, Float.parseFloat(String.valueOf(despesaTotal))));
+        despesasEntry.add(new BarEntry(1f, Float.parseFloat(String.valueOf(despesaPaga))));
 
-        });
+        BarDataSet receitasSet = new BarDataSet(receitasEntry, "Receitas Total x Recebidas");
+        receitasSet.setColors(ColorTemplate.MATERIAL_COLORS);
+        BarDataSet despesasSet = new BarDataSet(despesasEntry, "Despesas Total x Pagas");
+        despesasSet.setColors(ColorTemplate.PASTEL_COLORS);
 
-        StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
-        staticLabelsFormatter.setHorizontalLabels(new String[] {"", "Receita", "", "Despesa", ""});
+        Description description = new Description();
+        description.setText("Receita x Despesa - " + DateUtil.getMonthAndYear(new Date()));
 
-        graph.setTitle("Receitas x Despesas");
-        graph.setTitleTextSize(40);
-        graph.getViewport().setMaxX(4);
-        graph.getViewport().setMinX(0);
-        graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
+        BarData data = new BarData(receitasSet, despesasSet);
+        data.setBarWidth(0.9f); // set custom bar width
+        chart.setData(data);
+        chart.setDescription(description);
+        chart.getXAxis().setEnabled(false);
+        chart.setFitBars(true); // make the x-axis fit exactly all bars
+        chart.invalidate();
 
-        series.setDrawValuesOnTop(true);
-        series.setValuesOnTopColor(ColorUtil.BLACK);
-        series.setValueDependentColor(data -> {
-            int color = 0;
-            if(data.getX() == 1) {
-                color = ColorUtil.DARK_GREEN;
-            } else if(data.getX() == 3) {
-                color =  ColorUtil.DARK_RED;
-            }
-            return color;
-        });
-        series.setSpacing(20);
-        series.setAnimated(true);
-        graph.addSeries(series);
     }
 
-    private void startProjecaoSaldoGraph(GraphView graph, Conta conta) {
-        TransacaoService transacaoService = new TransacaoService(mContext);
+    private BigDecimal calcularSaldoInicial(List<Transacao> transacoes, Conta conta) {
+        BigDecimal saldoInicial = conta.getSaldo();
 
-        List<Transacao> transacaoList = new ArrayList<>();
-
-        try {
-            transacaoList = transacaoService.getTransacoesPeriodoConta(PeriodoUtil.thisMonth(new Date()),conta, false);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        for(Transacao t : transacoes) {
+            if(t.isEfetivado() && t.getTipo() == TransacaoTipo.Despesa) saldoInicial = saldoInicial.add(t.getValor());
+            if(t.isEfetivado() && t.getTipo() == TransacaoTipo.Receita) saldoInicial = saldoInicial.subtract(t.getValor());
         }
 
-        BigDecimal saldoAtual = conta.getSaldo();
-
-        DataPoint[] points;
-        int index = 0;
-
-        if(transacaoList.size() > 1) {
-
-            points = new DataPoint[transacaoList.size()];
-
-            for(Transacao t : transacaoList) {
-
-                if(t.getTipo() == TransacaoTipo.Despesa) {
-                    saldoAtual = saldoAtual.subtract(t.getValor());
-                } else {
-                    saldoAtual = saldoAtual.add(t.getValor());
-                }
-                points[index] = new DataPoint(t.getVencimento().getDate(), Double.parseDouble(String.valueOf(saldoAtual)));
-                index++;
-
-            }
-        } else if(transacaoList.size() == 1) {
-            points = new DataPoint[3];
-            for(Transacao t : transacaoList) {
-                if(t.getTipo() == TransacaoTipo.Despesa) {
-                    saldoAtual = saldoAtual.subtract(t.getValor());
-                } else {
-                    saldoAtual = saldoAtual.add(t.getValor());
-                }
-            }
-
-            if(transacaoList.get(0).getVencimento().getDate() < new Date().getDate()) {
-                points[0] = new DataPoint(transacaoList.get(0).getVencimento().getDate(), Double.parseDouble(String.valueOf(saldoAtual)));
-                points[1] = new DataPoint(new Date().getDate(), Double.parseDouble(String.valueOf(saldoAtual)));
-                points[2] = new DataPoint(new Date().getDate() + 1, Double.parseDouble(String.valueOf(saldoAtual)));
-            } else if(transacaoList.get(0).getVencimento().getDate() == new Date().getDate()) {
-                points[0] = new DataPoint(new Date().getDate() - 1, Double.parseDouble(String.valueOf(conta.getSaldo())));
-                points[1] = new DataPoint(transacaoList.get(0).getVencimento().getDate(), Double.parseDouble(String.valueOf(saldoAtual)));
-                points[2] = new DataPoint(new Date().getDate() + 1, Double.parseDouble(String.valueOf(saldoAtual)));
-            } else if(transacaoList.get(0).getVencimento().getDate() > new Date().getDate()){
-                points[0] = new DataPoint(new Date().getDate() - 1, Double.parseDouble(String.valueOf(conta.getSaldo())));
-                points[1] = new DataPoint(new Date().getDate(), Double.parseDouble(String.valueOf(conta.getSaldo())));
-                points[2] = new DataPoint(transacaoList.get(0).getVencimento().getDate(), Double.parseDouble(String.valueOf(saldoAtual)));
-            }
-
-        } else {
-            points = new DataPoint[3];
-            points[0] = new DataPoint(new Date().getDate() - 1, Double.parseDouble(String.valueOf(saldoAtual)));
-            points[1] = new DataPoint(new Date().getDate(), Double.parseDouble(String.valueOf(saldoAtual)));
-            points[2] = new DataPoint(new Date().getDate() + 1, Double.parseDouble(String.valueOf(saldoAtual)));
-        }
-
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(points);
-
-
-
-        graph.setTitle("Projeção do Saldo");
-        graph.setTitleTextSize(40);
-
-        // set date label formatter
-        //graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(mContext));
-        //graph.getGridLabelRenderer().setNumHorizontalLabels(4); // only 4 because of the space
-
-        // set manual x bounds to have nice steps
-
-        /*
-        if(transacaoList.size() > 0) {
-            graph.getViewport().setMinX(transacaoList.get(0).getVencimento().getDate());
-            graph.getViewport().setMaxX(transacaoList.get(transacaoList.size() - 1).getVencimento().getDate());
-
-
-        } else {
-            graph.getViewport().setMinX(new Date().getDate() -1);
-            graph.getViewport().setMaxX(new Date().getDate() + 1);
-
-        }
-
-        graph.getViewport().setXAxisBoundsManual(true);
-        */
-
-        // as we use dates as labels, the human rounding to nice readable numbers
-        // is not necessary
-        graph.getGridLabelRenderer().setHumanRounding(false);
-
-        series.setDrawDataPoints(true);
-        series.setDataPointsRadius(10);
-        series.setAnimated(true);
-        graph.addSeries(series);
-
-
-
-
+        return saldoInicial;
     }
 
 }

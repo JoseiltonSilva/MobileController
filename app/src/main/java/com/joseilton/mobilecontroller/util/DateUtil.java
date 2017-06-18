@@ -115,6 +115,20 @@ public class DateUtil {
     }
 
     /**
+     * Retorma uma String com o ano yyyy.
+     *
+     * @param data
+     * @return
+     */
+    public static int getYear(Date data) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(data);
+
+        return cal.get(Calendar.YEAR);
+
+    }
+
+    /**
      * Retorma uma String com a data formatada mmm/yyyy.
      *
      * @param data

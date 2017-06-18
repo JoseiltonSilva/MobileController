@@ -3,13 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".transferencia.TransferenciasActivity">
 
-    <item android:id="@+id/action_novo"
-        android:title="@string/label_action_novo"
+    <item
+        android:id="@+id/action_novo"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_add_circle_outline_white_24dp"
+        app:showAsAction="always"
+        android:title="@string/label_novo"/>
 
-    <item android:id="@+id/action_voltar"
-        android:title="@string/label_action_voltar"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
+
 </menu>

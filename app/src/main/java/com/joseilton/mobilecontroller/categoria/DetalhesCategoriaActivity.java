@@ -1,7 +1,6 @@
 package com.joseilton.mobilecontroller.categoria;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -281,25 +280,17 @@ public class DetalhesCategoriaActivity extends AppCompatActivity implements View
         builder.setTitle(titulo);
 
 
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Ok", (dialog, arg1) -> {
 
-            @Override
-            public void
-            onClick(DialogInterface dialog, int arg1) {
-
-                if (action == SALVAR_ACTION) {
-                    salvar();
-                } else if (action == EXCLUIR_ACTION) {
-                    excluir();
-                }
+            if (action == SALVAR_ACTION) {
+                salvar();
+            } else if (action == EXCLUIR_ACTION) {
+                excluir();
             }
         });
 
-        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+        builder.setNegativeButton("Cancelar", (dialog, which) -> {
 
-            }
         });
 
         AlertDialog alertDialog = builder.create();

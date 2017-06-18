@@ -18,7 +18,8 @@
     <string name="label_erro_conta_descricao">Digite uma descrição</string>
     <string name="label_erro_conta_saldo">Digite o saldo</string>
     <string name="label_erro_conta_limite">Digite o limite</string>
-
+    <string name="label_graf_projecao_saldo">Projeção de Saldo</string>
+    <string name="label_graf_receitas_despesas">Receitas x Despesas</string>
     <!-- TRANSACAO -->
     <string name="label_transacao_despesa">Despesa</string>
     <string name="label_transacao_descricao">Descrição</string>
@@ -31,6 +32,7 @@
     <string name="label_transacao_valor">Valor</string>
     <string name="label_erro_transacao_descricao">Digite uma descrição</string>
     <string name="label_erro_transacao_valor">Digite o valor</string>
+    <string name="label_title_transacao_graf">Receitas x Despesas</string>
 
     <!-- TRANSFERENCIA -->
     <string name="label_transferencia_valor">Digite o valor</string>

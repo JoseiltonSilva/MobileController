@@ -149,17 +149,17 @@ public class TransferenciaService {
         if (transferencia.isValid()) {
             try {
                 TransactionManager.callInTransaction(mHelper.getConnectionSource(),
-                        new Callable<Void>() {
-                            public Void call() throws Exception {
+                    new Callable<Void>() {
+                        public Void call() throws Exception {
 
-                                ContaDao contaDao = new ContaDao(mHelper.getConnectionSource());
-                                contaDao.updateItem(transferencia.getContaDestino());
-                                contaDao.updateItem(transferencia.getContaOrigem());
-                                mDao.insertItem(transferencia);
+                            ContaDao contaDao = new ContaDao(mHelper.getConnectionSource());
+                            contaDao.updateItem(transferencia.getContaDestino());
+                            contaDao.updateItem(transferencia.getContaOrigem());
+                            mDao.insertItem(transferencia);
 
-                                return null;
-                            }
-                        });
+                            return null;
+                        }
+                    });
             } catch (SQLException e) {
                 e.printStackTrace();
                 throw new SQLException(e.getMessage());
@@ -182,17 +182,17 @@ public class TransferenciaService {
     public void excluirTransferencia(final Transferencia transferencia) throws SQLException {
         try {
             TransactionManager.callInTransaction(mHelper.getConnectionSource(),
-                    new Callable<Void>() {
-                        public Void call() throws Exception {
+                new Callable<Void>() {
+                    public Void call() throws Exception {
 
-                            ContaDao contaDao = new ContaDao(mHelper.getConnectionSource());
-                            contaDao.updateItem(transferencia.getContaDestino());
-                            contaDao.updateItem(transferencia.getContaOrigem());
-                            mDao.deleteItem(transferencia);
+                        ContaDao contaDao = new ContaDao(mHelper.getConnectionSource());
+                        contaDao.updateItem(transferencia.getContaDestino());
+                        contaDao.updateItem(transferencia.getContaOrigem());
+                        mDao.deleteItem(transferencia);
 
-                            return null;
-                        }
-                    });
+                        return null;
+                    }
+                });
         } catch (SQLException e) {
             e.printStackTrace();
             throw new SQLException(e.getMessage());

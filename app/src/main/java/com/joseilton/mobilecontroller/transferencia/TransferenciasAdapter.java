@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.joseilton.mobilecontroller.R;
+import com.joseilton.mobilecontroller.app.Formatador;
 import com.joseilton.mobilecontroller.util.DateUtil;
 
 import java.util.List;
@@ -50,8 +51,8 @@ public class TransferenciasAdapter extends RecyclerView.Adapter<TransferenciasAd
         holder.descricao.setText(transferencia.getDescricao());
         holder.contaOrigem.setText(transferencia.getContaOrigem().getDescricao());
         holder.contaDestino.setText(transferencia.getContaDestino().getDescricao());
-        holder.data.setText(DateUtil.getFormatData(transferencia.getData()));
-        holder.valor.setText(transferencia.getValor().toString());
+        holder.data.setText(DateUtil.getDay(transferencia.getData()) + ", " + transferencia.getData().getDate() + " de " + DateUtil.getMonth(transferencia.getData()) + " de " + DateUtil.getYear(transferencia.getData()));
+        holder.valor.setText(Formatador.formatarValorMonetario(transferencia.getValor()));
     }
 
     @Override

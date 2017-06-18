@@ -19,20 +19,22 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.helper.StaticLabelsFormatter;
-import com.jjoe64.graphview.series.BarGraphSeries;
-import com.jjoe64.graphview.series.DataPoint;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.joseilton.mobilecontroller.R;
 import com.joseilton.mobilecontroller.app.RecyclerTouchListener;
 import com.joseilton.mobilecontroller.categoria.CategoriasActivity;
-import com.joseilton.mobilecontroller.util.ColorUtil;
 import com.joseilton.mobilecontroller.util.DateUtil;
 import com.joseilton.mobilecontroller.util.MensagemUtil;
 import com.joseilton.mobilecontroller.util.PeriodoUtil;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -191,22 +193,26 @@ public class TransacoesFragment extends Fragment implements View.OnClickListener
         } else if (view.getId() == R.id.next_imageButton) {
             filtrarProximoMes();
         } else if (view.getId() == R.id.filtro_textView) {
-            inicializarGraphLayout();
+            exibirBarChart();
         }
     }
 
-    private void inicializarGraphLayout() {
+    private void exibirBarChart() {
 
         View view;
 
         BigDecimal despesaTotal = new BigDecimal("0.00");
+        BigDecimal despesaPaga = new BigDecimal("0.00");
         BigDecimal receitaTotal = new BigDecimal("0.00");
+        BigDecimal receitaRecebida = new BigDecimal("0.00");
 
         for(Transacao t : transacoes) {
             if(t.getTipo() == TransacaoTipo.Despesa) {
                 despesaTotal = despesaTotal.add(t.getValor());
+                if(t.isEfetivado()) despesaPaga = despesaPaga.add(t.getValor());
             } else {
                 receitaTotal = receitaTotal.add(t.getValor());
+                if(t.isEfetivado()) receitaRecebida = receitaRecebida.add(t.getValor());
             }
         }
 
@@ -214,43 +220,38 @@ public class TransacoesFragment extends Fragment implements View.OnClickListener
         LayoutInflater inflater = getActivity().getLayoutInflater();
         view = inflater.inflate(R.layout.transacao_graph, null);
         builder.setView(view)
-                .setNegativeButton(getString(R.string.label_action_sair), (dialog, which) -> {
+                .setNegativeButton(getString(R.string.label_action_voltar), (dialog, which) -> {
 
                 }
         );
 
-        GraphView graph = (GraphView) view.findViewById(R.id.graph);
-        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
-                new DataPoint(1, Double.parseDouble(String.valueOf(receitaTotal))),
-                new DataPoint(3, Double.parseDouble(String.valueOf(despesaTotal))),
+        BarChart chart = (BarChart) view.findViewById(R.id.chart);
 
-        });
+        List<BarEntry> receitasEntry = new ArrayList<>();
+        receitasEntry.add(new BarEntry(0f, Float.parseFloat(String.valueOf(receitaTotal))));
+        receitasEntry.add(new BarEntry(0f, Float.parseFloat(String.valueOf(receitaRecebida))));
+        List<BarEntry> despesasEntry = new ArrayList<>();
+        despesasEntry.add(new BarEntry(1f, Float.parseFloat(String.valueOf(despesaTotal))));
+        despesasEntry.add(new BarEntry(1f, Float.parseFloat(String.valueOf(despesaPaga))));
 
-        StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
-        staticLabelsFormatter.setHorizontalLabels(new String[] {"", getString(R.string.label_transacao_receita), "", getString(R.string.label_transacao_despesa), ""});
+        BarDataSet receitasSet = new BarDataSet(receitasEntry, "Rec Total x Recebidas");
+        receitasSet.setColors(ColorTemplate.MATERIAL_COLORS);
+        BarDataSet despesasSet = new BarDataSet(despesasEntry, "Desp Total x Pagas");
+        despesasSet.setColors(ColorTemplate.PASTEL_COLORS);
 
-        graph.setTitle(getString(R.string.label_receita_x_despesa));
-        graph.setTitleTextSize(60);
-        graph.getViewport().setMaxX(4);
-        graph.getViewport().setMinX(0);
-        graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
+        Description description = new Description();
+        description.setText("Receita x Despesa - " +  filtroTextView.getText());
 
-        series.setDrawValuesOnTop(true);
-        series.setValuesOnTopColor(ColorUtil.BLACK);
-        series.setValueDependentColor(data -> {
-            int color = 0;
-            if(data.getX() == 1) {
-                color = ColorUtil.DARK_GREEN;
-            } else if(data.getX() == 3) {
-                color =  ColorUtil.DARK_RED;
-            }
-            return color;
-        });
-        series.setSpacing(20);
-        series.setAnimated(true);
-        graph.addSeries(series);
+        BarData data = new BarData(receitasSet, despesasSet);
+        data.setBarWidth(0.9f); // set custom bar width
+        chart.setData(data);
+        chart.setDescription(description);
+        chart.getXAxis().setEnabled(false);
+        chart.setFitBars(true); // make the x-axis fit exactly all bars
+        chart.invalidate();
 
         AlertDialog alertDialog = builder.create();
+        alertDialog.setTitle("Receitas x Despesas - " + filtroTextView.getText());
         alertDialog.show();
     }
 

@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-public class TransferenciasActivity extends AppCompatActivity implements View.OnClickListener{
+public class TransferenciasActivity extends AppCompatActivity {
 
     private final static String LOG = "TransferenciasActivity";
 
@@ -40,7 +40,6 @@ public class TransferenciasActivity extends AppCompatActivity implements View.On
         setContentView(R.layout.activity_transferencias);
 
         setupToolbar();
-        setupFab();
 
         setupRecyclerView();
 
@@ -116,7 +115,6 @@ public class TransferenciasActivity extends AppCompatActivity implements View.On
 
         if (id == R.id.action_novo) novo();
 
-        if (id == R.id.action_voltar) onBackPressed();
 
         return super.onOptionsItemSelected(item);
     }
@@ -124,19 +122,6 @@ public class TransferenciasActivity extends AppCompatActivity implements View.On
     private void release() {
         mAdapter = new TransferenciasAdapter(transferencias);
         recyclerView.setAdapter(mAdapter);
-    }
-
-    private void setupFab() {
-        if (fab == null) fab = (FloatingActionButton) findViewById(R.id.fab);
-
-        fab.setEnabled(true);
-        fab.setVisibility(View.VISIBLE);
-        fab.setOnClickListener(this);
-    }
-
-    @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.fab) novo();
     }
 
     private void novo() {

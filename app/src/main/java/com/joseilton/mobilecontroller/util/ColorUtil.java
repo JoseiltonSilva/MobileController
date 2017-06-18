@@ -6,7 +6,7 @@ public class ColorUtil{
 
 	public static final int BLACK = Color.BLACK;
 	public static final int WHITE = Color.WHITE;
-	public static final int GREE = Color.GREEN;
+	public static final int GREEN = Color.GREEN;
 	public static final int GREY = Color.GRAY;
 	public static final int RED = Color.RED;
 

@@ -9,6 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.joseilton.mobilecontroller.R;
+import com.joseilton.mobilecontroller.app.Formatador;
 import com.joseilton.mobilecontroller.util.ColorUtil;
 import com.joseilton.mobilecontroller.util.DateUtil;
 
@@ -62,7 +63,7 @@ public class TransacoesAdapter extends RecyclerView.Adapter<TransacoesAdapter.My
             holder.categoria.setText(transacao.getCategoria().getDescricao());
             holder.tipo.setText(transacao.getTipo().toString());
             holder.conta.setText(transacao.getConta().getDescricao());
-            holder.valor.setText(transacao.getValor().toString());
+            holder.valor.setText(Formatador.formatarValorMonetario(transacao.getValor()));
             holder.vencimento.setText(DateUtil.getDay(transacao.getVencimento()) + ", " + transacao.getVencimento().getDate() + " de " + DateUtil.getMonth(transacao.getVencimento()));
 
             if (transacao.getStatus() != null) {
