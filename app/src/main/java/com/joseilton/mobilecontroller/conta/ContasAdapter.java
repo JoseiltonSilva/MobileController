@@ -77,6 +77,12 @@ public class ContasAdapter extends RecyclerView.Adapter<ContasAdapter.MyViewHold
         holder.tipo.setText(conta.getTipo().getTipo());
         holder.saldo.setText(Formatador.formatarValorMonetario(conta.getSaldo()));
 
+        if(conta.getSaldo().compareTo(new BigDecimal("0.00")) >= 0) {
+            holder.saldo.setTextColor(ColorUtil.DARK_GREEN);
+        } else {
+            holder.saldo.setTextColor(ColorUtil.DARK_RED);
+        }
+
         exibirLineChart(holder.lineChart, conta);
         exibirBarChart(holder.barChart, conta);
     }
